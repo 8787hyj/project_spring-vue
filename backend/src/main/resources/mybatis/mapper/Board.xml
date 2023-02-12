@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="kr.co.gallery.backend.dao.BoardDao">
+	
+	<!-- 조회 -->
+	<select id="list" resultType="kr.co.gallery.backend.model.BoardVO">
+		select * from boards
+	</select>	
+	
+	<!-- 게시판 -->
+	<insert id="boardEnroll" parameterType="kr.co.gallery.backend.model.BoardVO" useGeneratedKeys="true" keyColumn="boardid" keyProperty="boardid">
+		insert into boards(boardno, content, title, writer)
+		VALUES (CAST(#{boardno} AS INTEGER), #{content}, #{title}, #{writer})
+	</insert>
+	
+	<!-- 이미지 -->
+	<insert id="imageEnroll" parameterType="kr.co.gallery.backend.model.AttachImageVO" useGeneratedKeys="true" keyColumn="imageid" keyProperty="imageId">
+	    insert into board_image(fileName, uploadPath, uuid, boardid) 
+	    values (#{fileName}, #{uploadPath}, #{uuid}, #{boardid})
+	</insert>
+	
+	<!-- 파일 -->
+	<insert id="fileEnroll" parameterType="kr.co.gallery.backend.model.AttachFileVO" useGeneratedKeys="true" keyColumn="fileid" keyProperty="fileId">
+	    insert into board_file(fileName, uploadPath, uuid, boardid) 
+	    values (#{fileName}, #{uploadPath}, #{uuid}, #{boardid})
+	</insert>
+	
+	<resultMap id="boardResult" type="kr.co.gallery.backend.model.BoardVO">
+	    <result property="boardno" column="boardno"/>
+	    <result property="content" column="content"/>
+	    <result property="title" column="title"/>
+	    <result property="writer" column="writer"/>
+	    <result property="boardid" column="boardid"/>
+	    <collection property="imageList" column="boardid" javaType="java.util.ArrayList" ofType="kr.co.gallery.backend.model.AttachImageVO" select="findImage"/>
+	    <collection property="fileList" column="boardid" javaType="java.util.ArrayList" ofType="kr.co.gallery.backend.model.AttachFileVO" select="findFile"/>
+	</resultMap>
+
+	<select id="openPostView" resultMap="boardResult" parameterType="Integer" >
+		select * from boards where boardid = #{boardid}
+	</select>
+	
+	<select id="findImage" parameterType="Integer" resultType="kr.co.gallery.backend.model.AttachImageVO">
+		select * from board_image where boardid = #{boardid}
+	</select>
+	<select id="findFile" parameterType="Integer" resultType="kr.co.gallery.backend.model.AttachFileVO">
+		select * from board_file where boardid = #{boardid}
+	</select>
+	
+	<update id="boardUpdate">
+		UPDATE boards
+		SET "content"=#{content}, title=#{title}, writer=#{writer}
+		WHERE boardid=#{boardid}
+	</update>
+	
+	<update id="imageUpdate">
+		UPDATE board_image
+		SET fileName=#{fileName}, uploadPath=#{uploadPath}, uuid=#{uuid}
+		WHERE imageid=#{imageId}
+	</update>
+	
+	<update id="fileUpdate">
+		UPDATE board_file
+		SET fileName=#{fileName}, uploadPath=#{uploadPath}, uuid=#{uuid}
+		WHERE fileid=#{fileId}
+	</update>
+	
+	<select id="boardsImageSelect" resultType="kr.co.gallery.backend.model.BoardsImageVO">
+		select imageid from boards_image bi where boardid = #{boardid}
+	</select>
+</mapper>
