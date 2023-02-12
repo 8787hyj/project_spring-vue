@@ -5,5 +5,5 @@ vue 3 + vite + spring boot
 + image upload, image resize
 + element-plus : el-upload 
 
-back-end : spring boot
-front-end : vite_board
+### back-end : spring boot
+### front-end : vite_board
